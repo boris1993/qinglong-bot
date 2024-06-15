@@ -1,0 +1,18 @@
+{
+  "include": [
+    "src"
+  ],
+  "compilerOptions": {
+    "module": "ES6",
+    "target": "ES6",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "alwaysStrict": true
+  },
+  "ts-node": {
+    "esm": true
+  }
+}

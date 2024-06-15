@@ -1,0 +1,22 @@
+{
+  "name": "qinglong-env-updater",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Update environment variables stored in Qing Long with Webhook",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node --loader ts-node/esm src/index.ts"
+  },
+  "author": "boris1993",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "util": "^0.12.5",
+    "express": "^4.19.2",
+    "axios": "^1.7.2",
+    "dingtalk-stream": "^2.1.4"
+  }
+}
