@@ -1,6 +1,7 @@
 .idea/*
-*.iml
 node_modules/
+dist/
+*.iml
 .env
 .env.development.local
 .env.test.local
