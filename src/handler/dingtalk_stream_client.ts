@@ -1,7 +1,9 @@
+import * as util from "node:util";
+import axios from 'axios';
 import {DWClient, DWClientDownStream, RobotMessage, TOPIC_ROBOT} from 'dingtalk-stream';
+import {Command, USAGE_HELP_TEXT} from '../constants.js';
 import {DingTalkMessage} from '../model/dingtalk.js';
-import {updateEnvironmentVariables} from '../api/qinglong.js';
-import axios from "axios";
+import {updateEnvironmentVariables, getAllEnvironmentVariableKeys} from '../api/qinglong.js';
 
 let client: DWClient;
 
@@ -26,23 +28,31 @@ function registerDingTalkStreamClient() {
 
 const onBotMessage = async (event: DWClientDownStream) => {
     const message = JSON.parse(event.data) as RobotMessage;
-    const content = (message?.text?.content || '').trim();
-    const [envKey, envValue] = content.split('=');
+    const [command, content] = (message?.text?.content || '').trim().split('#');
 
     let responseMessage: string;
-    try {
-        await updateEnvironmentVariables(envKey, envValue);
-        responseMessage = `成功更新环境变量${envKey}`;
-    } catch (error: any) {
-        console.error(error.message);
-        responseMessage = `环境变量更新失败，错误信息：${error.message}`;
+    switch (command) {
+        case Command.GET_ALL_ENV:
+            const allEnvKeys = await getAllEnvironmentVariableKeys();
+            responseMessage = `环境变量列表:\n${allEnvKeys.join('\n')}`;
+            break;
+        case Command.UPDATE_ENV:
+            responseMessage = await handleUpdateEnv(content);
+            break;
+        default:
+            responseMessage = util.format(
+                USAGE_HELP_TEXT,
+                Object.values(Command).map(key => `\`${key}\``).join('，')
+            ).trim();
+            break;
     }
 
     const accessToken = await client.getAccessToken();
     const messageBody: DingTalkMessage = {
-        msgtype: 'text',
-        text: {
-            content: responseMessage
+        msgtype: 'markdown',
+        markdown: {
+            title: '执行结果',
+            text: responseMessage
         },
         at: {
             atUserIds: message?.senderStaffId || ''
@@ -55,13 +65,28 @@ const onBotMessage = async (event: DWClientDownStream) => {
         {
             responseType: 'json',
             headers: {
-                "x-acs-dingtalk-access-token": accessToken,
+                'x-acs-dingtalk-access-token': accessToken,
             }
         },
     );
 
     // 需要返回消息响应，否则服务端会在60秒后重发
     client.socketCallBackResponse(event.headers.messageId, replyMessageResponse.data);
+}
+
+async function handleUpdateEnv(content: string) {
+    const [envKey, envValue] = content.split('=');
+
+    let responseMessage: string;
+    try {
+        await updateEnvironmentVariables(envKey, envValue);
+        responseMessage = `成功更新环境变量${envKey}`;
+    } catch (error: any) {
+        console.error(error.message);
+        responseMessage = `环境变量更新失败，错误信息：${error.message}`;
+    }
+
+    return responseMessage;
 }
 
 export {

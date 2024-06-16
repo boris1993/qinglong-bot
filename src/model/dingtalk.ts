@@ -1,7 +1,11 @@
 interface DingTalkMessage {
     msgtype: string,
-    text: {
+    text?: {
         content: string,
+    },
+    markdown?: {
+        title: string,
+        text: string
     },
     at: {
         atUserIds: string

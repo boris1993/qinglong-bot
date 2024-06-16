@@ -1,6 +1,6 @@
 import * as util from 'node:util';
 import axios from "axios";
-import {QingLongAPI} from "./urls.js";
+import {QingLongAPI} from "../constants.js";
 import {UpdateEnvRequest, GetAllEnvResponse, LoginResult, Response} from "../model/qinglong.js";
 import {
     BadRequestError,
@@ -67,6 +67,12 @@ async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
     return getAllEnvResponse.data as GetAllEnvResponse[];
 }
 
+async function getAllEnvironmentVariableKeys() {
+    await loginIfNeeded();
+    const allEnvironmentVariables = await getAllEnvironmentVariables();
+    return allEnvironmentVariables.map(env => env.name);
+}
+
 async function updateEnvironmentVariables(
     key: string,
     value: string
@@ -112,5 +118,6 @@ function ensureSuccessfulResponse(response: Response) {
 
 export {
     initializeQingLongAPIClient,
-    updateEnvironmentVariables
+    updateEnvironmentVariables,
+    getAllEnvironmentVariableKeys,
 }
