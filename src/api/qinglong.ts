@@ -28,6 +28,14 @@ function initializeQingLongAPIClient() {
     if (!baseUrl || !clientId || !clientSecret) {
         throw new QingLongInitializationError();
     }
+
+    void login();
+    setInterval(async () => {
+        const currentTimestamp = Date.now();
+        if (currentTimestamp - 5000 >= expiration) {
+            await login();
+        }
+    }, 60000);
 }
 
 async function login() {
@@ -42,16 +50,7 @@ async function login() {
     console.info(`成功刷新青龙Token，有效期至${new Date(expiration).toLocaleString()}`);
 }
 
-async function loginIfNeeded() {
-    const currentTimestamp = Date.now();
-    if (currentTimestamp - 5000 >= expiration) {
-        await login();
-    }
-}
-
 async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
-    await loginIfNeeded();
-
     const response = await axios.get(
         `${baseUrl}${QingLongAPI.ENV}`,
         {
@@ -68,7 +67,6 @@ async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
 }
 
 async function getAllEnvironmentVariableKeys() {
-    await loginIfNeeded();
     const allEnvironmentVariables = await getAllEnvironmentVariables();
     return allEnvironmentVariables.map(env => env.name);
 }
@@ -80,8 +78,6 @@ async function updateEnvironmentVariables(
     if (!key || !value) {
         throw new BadRequestError('更新环境变量消息格式有误，正确格式为：key=value');
     }
-
-    await loginIfNeeded();
 
     const allEnvironmentVariables = await getAllEnvironmentVariables();
     const envToBeUpdated = allEnvironmentVariables.filter(env => env.name === key)[0];
