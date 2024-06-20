@@ -41,7 +41,9 @@ jobs:
         with:
           images: |
             boris1993/qinglong-env-updater
+            boris1993/qinglong-bot
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
+            registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
