@@ -4,6 +4,7 @@ import {DWClient, DWClientDownStream, RobotMessage, TOPIC_ROBOT} from 'dingtalk-
 import {Command, USAGE_HELP_TEXT} from '../constants.js';
 import {DingTalkMessage} from '../model/dingtalk.js';
 import {updateEnvironmentVariables, getAllEnvironmentVariableKeys} from '../api/qinglong.js';
+import {getErrorMessage} from '../util/error_utils.js';
 
 let client: DWClient;
 
@@ -32,19 +33,22 @@ const onBotMessage = async (event: DWClientDownStream) => {
 
     let responseMessage: string;
     switch (command) {
-        case Command.GET_ALL_ENV:
+        case Command.GET_ALL_ENV: {
             const allEnvKeys = await getAllEnvironmentVariableKeys();
             responseMessage = `环境变量列表:\n${allEnvKeys.join('\n')}`;
             break;
-        case Command.UPDATE_ENV:
+        }
+        case Command.UPDATE_ENV: {
             responseMessage = await handleUpdateEnv(content);
             break;
-        default:
+        }
+        default: {
             responseMessage = util.format(
                 USAGE_HELP_TEXT,
                 Object.values(Command).map(key => `\`${key}\``).join('，')
             ).trim();
             break;
+        }
     }
 
     const accessToken = await client.getAccessToken();
@@ -81,9 +85,10 @@ async function handleUpdateEnv(content: string) {
     try {
         await updateEnvironmentVariables(envKey, envValue);
         responseMessage = `成功更新环境变量${envKey}`;
-    } catch (error: any) {
-        console.error(error.message);
-        responseMessage = `环境变量更新失败，错误信息：${error.message}`;
+    } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        console.error(errorMessage);
+        responseMessage = `环境变量更新失败，错误信息：${errorMessage}`;
     }
 
     return responseMessage;

@@ -7,7 +7,7 @@ interface UpdateEnvRequest {
 interface Response {
     code: number,
     message?: string,
-    data?: LoginResult | GetAllEnvResponse | any,
+    data?: LoginResult | GetAllEnvResponse,
 }
 
 interface LoginResult {
