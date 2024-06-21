@@ -10,15 +10,20 @@
     "dev": "node --import=./register.js src/index.ts"
   },
   "dependencies": {
-    "util": "^0.12.5",
-    "express": "^4.19.2",
     "axios": "^1.7.2",
-    "dingtalk-stream": "^2.1.4"
+    "dingtalk-stream": "^2.1.4",
+    "express": "^4.19.2",
+    "util": "^0.12.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.2",
+    "eslint": "^8.56.0",
+    "globals": "^15.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.1"
   }
 }
