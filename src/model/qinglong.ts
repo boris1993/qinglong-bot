@@ -7,7 +7,7 @@ interface UpdateEnvRequest {
 interface Response {
     code: number,
     message?: string,
-    data?: LoginResult | GetAllEnvResponse,
+    data?: LoginResult | GetAllEnvResponse[] | GetAllCronJobResponse[],
 }
 
 interface LoginResult {
@@ -28,9 +28,35 @@ interface GetAllEnvResponse {
     updatedAt: string
 }
 
+interface GetAllCronJobResponse {
+    data: GetAllCronJobData[],
+    total: number
+}
+
+interface GetAllCronJobData {
+    id: number,
+    name: string,
+    command: string,
+    schedule: string,
+    timestamp: string,
+    saved: boolean,
+    status: number,
+    isSystem: number,
+    pid: number,
+    isDisabled: number,
+    isPinned: number,
+    logPath: string,
+    labels: string[],
+    lastRunningTime: number,
+    lastExecutionTime: number,
+    createdAt: string,
+    updatedAt: string,
+}
+
 export {
     UpdateEnvRequest,
     Response,
     LoginResult,
     GetAllEnvResponse,
+    GetAllCronJobResponse,
 }

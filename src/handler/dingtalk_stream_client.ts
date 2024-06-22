@@ -3,7 +3,11 @@ import axios from 'axios';
 import {DWClient, DWClientDownStream, RobotMessage, TOPIC_ROBOT} from 'dingtalk-stream';
 import {Command, USAGE_HELP_TEXT} from '../constants.js';
 import {DingTalkMessage} from '../model/dingtalk.js';
-import {updateEnvironmentVariables, getAllEnvironmentVariableKeys} from '../api/qinglong.js';
+import {
+    updateEnvironmentVariables,
+    getAllEnvironmentVariableKeys,
+    getAllCronJobNames,
+} from '../api/qinglong.js';
 import {getErrorMessage} from '../util/error_utils.js';
 
 let client: DWClient;
@@ -32,22 +36,34 @@ const onBotMessage = async (event: DWClientDownStream) => {
     const [command, content] = (message?.text?.content || '').trim().split('#');
 
     let responseMessage: string;
-    switch (command) {
-        case Command.GET_ALL_ENV: {
-            const allEnvKeys = await getAllEnvironmentVariableKeys();
-            responseMessage = `环境变量列表:\n${allEnvKeys.join('\n')}`;
-            break;
+    try {
+        switch (command) {
+            case Command.GET_ALL_ENV: {
+                const allEnvKeys = await getAllEnvironmentVariableKeys();
+                responseMessage = `环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+                break;
+            }
+            case Command.UPDATE_ENV: {
+                responseMessage = await handleUpdateEnv(content);
+                break;
+            }
+            case Command.GET_ALL_CRON_JOBS: {
+                const allCronJobs = await getAllCronJobNames();
+                responseMessage = `定时任务列表：\n\n${allCronJobs.join('\n\n')}`;
+                break;
+            }
+            default: {
+                responseMessage = util.format(
+                    USAGE_HELP_TEXT,
+                    Object.values(Command).map(key => `\`${key}\``).join('，')
+                ).trim();
+                break;
+            }
         }
-        case Command.UPDATE_ENV: {
-            responseMessage = await handleUpdateEnv(content);
-            break;
-        }
-        default: {
-            responseMessage = util.format(
-                USAGE_HELP_TEXT,
-                Object.values(Command).map(key => `\`${key}\``).join('，')
-            ).trim();
-            break;
+    } catch (error) {
+        responseMessage = getErrorMessage(error);
+        if (responseMessage.includes('jwt malformed')) {
+            responseMessage = `${responseMessage}，请检查青龙中是否赋予了对应的权限`;
         }
     }
 

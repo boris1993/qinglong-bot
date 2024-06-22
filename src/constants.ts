@@ -1,11 +1,13 @@
 enum Command {
     GET_ALL_ENV = '获取所有环境变量',
-    UPDATE_ENV = '更新环境变量'
+    UPDATE_ENV = '更新环境变量',
+    GET_ALL_CRON_JOBS = '获取所有任务',
 }
 
 const QingLongAPI = {
     LOGIN: '/open/auth/token?client_id=%s&client_secret=%s',
-    ENV: '/open/envs'
+    ENV: '/open/envs',
+    CRON_JOB: '/open/crons',
 }
 
 const USAGE_HELP_TEXT = `

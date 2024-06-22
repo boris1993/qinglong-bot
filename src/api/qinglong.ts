@@ -1,7 +1,13 @@
 import * as util from 'node:util';
 import axios from "axios";
 import {QingLongAPI} from "../constants.js";
-import {UpdateEnvRequest, GetAllEnvResponse, LoginResult, Response} from "../model/qinglong.js";
+import {
+    Response,
+    LoginResult,
+    UpdateEnvRequest,
+    GetAllEnvResponse,
+    GetAllCronJobResponse,
+} from "../model/qinglong.js";
 import {
     BadRequestError,
     QingLongAPIError,
@@ -51,24 +57,21 @@ async function login() {
 }
 
 async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
-    const response = await axios.get(
-        `${baseUrl}${QingLongAPI.ENV}`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-    );
-
-    const getAllEnvResponse = response.data as Response;
-    ensureSuccessfulResponse(getAllEnvResponse);
-
-    return getAllEnvResponse.data as GetAllEnvResponse[];
+    return await doRequest<GetAllEnvResponse[]>(QingLongAPI.ENV);
 }
 
-async function getAllEnvironmentVariableKeys() {
+async function getAllEnvironmentVariableKeys(): Promise<string[]> {
     const allEnvironmentVariables = await getAllEnvironmentVariables();
     return allEnvironmentVariables.map(env => env.name);
+}
+
+async function getAllCronJobs(): Promise<GetAllCronJobResponse> {
+    return await doRequest<GetAllCronJobResponse>(QingLongAPI.CRON_JOB);
+}
+
+async function getAllCronJobNames(): Promise<string[]> {
+    const allCronJobs = await getAllCronJobs();
+    return allCronJobs.data.map(cron => cron.name);
 }
 
 async function updateEnvironmentVariables(
@@ -104,6 +107,21 @@ async function updateEnvironmentVariables(
     ensureSuccessfulResponse(updateEnvResponse);
 }
 
+async function doRequest<T>(path: string): Promise<T> {
+    const response = await axios.get(
+        `${baseUrl}${path}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+    const qingLongResponse = response.data as Response;
+    ensureSuccessfulResponse(qingLongResponse);
+
+    return qingLongResponse.data as T;
+}
+
 function ensureSuccessfulResponse(response: Response) {
     const code = response.code;
     if (code !== 200) {
@@ -116,4 +134,5 @@ export {
     initializeQingLongAPIClient,
     updateEnvironmentVariables,
     getAllEnvironmentVariableKeys,
+    getAllCronJobNames,
 }
