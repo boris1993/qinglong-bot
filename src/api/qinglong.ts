@@ -2,17 +2,20 @@ import * as util from 'node:util';
 import axios from "axios";
 import {QingLongAPI} from "../constants.js";
 import {
+    TriggerJobRequest,
+    UpdateEnvRequest,
     Response,
     LoginResult,
-    UpdateEnvRequest,
     GetAllEnvResponse,
     GetAllCronJobResponse,
+    QingLongRequest,
 } from "../model/qinglong.js";
 import {
     BadRequestError,
     QingLongAPIError,
     QingLongEnvNotFoundError,
-    QingLongInitializationError
+    QingLongInitializationError,
+    QingLongJobNotFoundError,
 } from "../error/error.js";
 
 axios.defaults.validateStatus = (status) => {
@@ -57,7 +60,7 @@ async function login() {
 }
 
 async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
-    return await doRequest<GetAllEnvResponse[]>(QingLongAPI.ENV);
+    return await doGetRequest<GetAllEnvResponse[]>(QingLongAPI.ENV);
 }
 
 async function getAllEnvironmentVariableKeys(): Promise<string[]> {
@@ -66,12 +69,24 @@ async function getAllEnvironmentVariableKeys(): Promise<string[]> {
 }
 
 async function getAllCronJobs(): Promise<GetAllCronJobResponse> {
-    return await doRequest<GetAllCronJobResponse>(QingLongAPI.CRON_JOB);
+    return await doGetRequest<GetAllCronJobResponse>(QingLongAPI.CRON_JOB);
 }
 
 async function getAllCronJobNames(): Promise<string[]> {
     const allCronJobs = await getAllCronJobs();
     return allCronJobs.data.map(cron => cron.name);
+}
+
+async function triggerJob(jobName: string): Promise<void> {
+    const allJobs = await getAllCronJobs();
+    const jobToBeTriggered = allJobs.data.filter(job => job.name === jobName)[0];
+    if (!jobToBeTriggered) {
+        throw new QingLongJobNotFoundError(jobName);
+    }
+
+    const jobId = jobToBeTriggered.id;
+    const triggerJobRequest: TriggerJobRequest = [jobId];
+    await doPutRequest(QingLongAPI.TRIGGER_JOB, triggerJobRequest);
 }
 
 async function updateEnvironmentVariables(
@@ -97,17 +112,13 @@ async function updateEnvironmentVariables(
     const response = await axios.put(
         `${baseUrl}${QingLongAPI.ENV}`,
         updateEnvRequest,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
+        getAxiosRequestConfig(),
     );
     const updateEnvResponse = response.data as Response;
     ensureSuccessfulResponse(updateEnvResponse);
 }
 
-async function doRequest<T>(path: string): Promise<T> {
+async function doGetRequest<T>(path: string): Promise<T> {
     const response = await axios.get(
         `${baseUrl}${path}`,
         {
@@ -122,6 +133,20 @@ async function doRequest<T>(path: string): Promise<T> {
     return qingLongResponse.data as T;
 }
 
+async function doPutRequest<T extends QingLongRequest>(
+    path: string,
+    data: T
+): Promise<void> {
+    const response = await axios.put(
+        `${baseUrl}${path}`,
+        data,
+        getAxiosRequestConfig(),
+    );
+
+    const qingLongResponse = response.data as Response;
+    ensureSuccessfulResponse(qingLongResponse);
+}
+
 function ensureSuccessfulResponse(response: Response) {
     const code = response.code;
     if (code !== 200) {
@@ -130,9 +155,18 @@ function ensureSuccessfulResponse(response: Response) {
     }
 }
 
+function getAxiosRequestConfig(): object {
+    return {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
+}
+
 export {
     initializeQingLongAPIClient,
     updateEnvironmentVariables,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
+    triggerJob,
 }

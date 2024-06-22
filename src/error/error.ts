@@ -16,6 +16,12 @@ class QingLongEnvNotFoundError extends Error {
     }
 }
 
+class QingLongJobNotFoundError extends Error {
+    constructor(name: string) {
+        super(`青龙定时任务${name}不存在`);
+    }
+}
+
 class QingLongAPIError extends Error {
     constructor(message: string) {
         super(`请求失败，错误信息：${message}`);
@@ -27,4 +33,5 @@ export {
     QingLongInitializationError,
     QingLongEnvNotFoundError,
     QingLongAPIError,
+    QingLongJobNotFoundError,
 }

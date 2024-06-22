@@ -1,7 +1,14 @@
-interface UpdateEnvRequest {
+abstract class QingLongRequest {
+}
+
+interface UpdateEnvRequest extends QingLongRequest{
     id: number,
     name: string,
     value: string,
+}
+
+interface TriggerJobRequest extends QingLongRequest {
+    [property: number]: number,
 }
 
 interface Response {
@@ -54,7 +61,9 @@ interface GetAllCronJobData {
 }
 
 export {
+    QingLongRequest,
     UpdateEnvRequest,
+    TriggerJobRequest,
     Response,
     LoginResult,
     GetAllEnvResponse,

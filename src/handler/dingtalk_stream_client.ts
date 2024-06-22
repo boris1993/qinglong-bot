@@ -7,6 +7,7 @@ import {
     updateEnvironmentVariables,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
+    triggerJob,
 } from '../api/qinglong.js';
 import {getErrorMessage} from '../util/error_utils.js';
 
@@ -50,6 +51,11 @@ const onBotMessage = async (event: DWClientDownStream) => {
             case Command.GET_ALL_CRON_JOBS: {
                 const allCronJobs = await getAllCronJobNames();
                 responseMessage = `定时任务列表：\n\n${allCronJobs.join('\n\n')}`;
+                break;
+            }
+            case Command.TRIGGER_JOB: {
+                await triggerJob(content);
+                responseMessage = `已执行定时任务${content}`;
                 break;
             }
             default: {
