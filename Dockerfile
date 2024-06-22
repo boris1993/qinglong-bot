@@ -16,7 +16,7 @@ FROM node:lts-alpine AS production
 ENV TZ=UTC
 ENV NODE_ENV=production
 
-HEALTHCHECK CMD wget -q http://localhost:3000/health || exit 1
+HEALTHCHECK CMD wget -O /dev/null -q http://localhost:3000/health || exit 1
 
 WORKDIR /app
 RUN corepack enable
