@@ -1,6 +1,6 @@
 import * as util from 'node:util';
-import axios from "axios";
-import {QingLongAPI} from "../constants.js";
+import axios from 'axios';
+import {QingLongAPI} from '../constants.js';
 import {
     TriggerJobRequest,
     UpdateEnvRequest,
@@ -9,14 +9,14 @@ import {
     GetAllEnvResponse,
     GetAllCronJobResponse,
     QingLongRequest,
-} from "../model/qinglong.js";
+} from '../model/qinglong.js';
 import {
     BadRequestError,
     QingLongAPIError,
     QingLongEnvNotFoundError,
     QingLongInitializationError,
     QingLongJobNotFoundError,
-} from "../error/error.js";
+} from '../error/error.js';
 
 axios.defaults.validateStatus = (status) => {
     return status < 500;

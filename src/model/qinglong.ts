@@ -1,7 +1,7 @@
 abstract class QingLongRequest {
 }
 
-interface UpdateEnvRequest extends QingLongRequest{
+interface UpdateEnvRequest extends QingLongRequest {
     id: number,
     name: string,
     value: string,

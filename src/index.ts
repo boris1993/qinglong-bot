@@ -1,5 +1,3 @@
-'use strict';
-
 import Express from 'express';
 import {initializeQingLongAPIClient} from './api/qinglong.js';
 import {registerDingTalkStreamClient} from './handler/dingtalk_stream_client.js';

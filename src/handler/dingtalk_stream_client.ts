@@ -1,4 +1,4 @@
-import * as util from "node:util";
+import * as util from 'node:util';
 import axios from 'axios';
 import {DWClient, DWClientDownStream, RobotMessage, TOPIC_ROBOT} from 'dingtalk-stream';
 import {Command, USAGE_HELP_TEXT} from '../constants.js';
