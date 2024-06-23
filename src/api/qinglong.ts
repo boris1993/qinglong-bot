@@ -109,13 +109,7 @@ async function updateEnvironmentVariables(
         value: value
     };
 
-    const response = await axios.put(
-        `${baseUrl}${QingLongAPI.ENV}`,
-        updateEnvRequest,
-        getAxiosRequestConfig(),
-    );
-    const updateEnvResponse = response.data as Response;
-    ensureSuccessfulResponse(updateEnvResponse);
+    await doPutRequest<UpdateEnvRequest>(QingLongAPI.ENV, updateEnvRequest);
 }
 
 async function getCronJobLog(jobName: string): Promise<string> {
@@ -134,11 +128,8 @@ async function getCronJobLog(jobName: string): Promise<string> {
 async function doGetRequest<T>(path: string): Promise<T> {
     const response = await axios.get(
         `${baseUrl}${path}`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        getAxiosRequestConfig()
+    );
 
     const qingLongResponse = response.data as Response;
     ensureSuccessfulResponse(qingLongResponse);
@@ -146,10 +137,7 @@ async function doGetRequest<T>(path: string): Promise<T> {
     return qingLongResponse.data as T;
 }
 
-async function doPutRequest<T extends QingLongRequest>(
-    path: string,
-    data: T
-): Promise<void> {
+async function doPutRequest<T extends QingLongRequest>(path: string, data: T): Promise<void> {
     const response = await axios.put(
         `${baseUrl}${path}`,
         data,
