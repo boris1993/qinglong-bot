@@ -3,6 +3,7 @@ enum Command {
     UPDATE_ENV = '更新环境变量',
     GET_ALL_CRON_JOBS = '获取所有任务',
     TRIGGER_JOB = '运行任务',
+    GET_LOG = '获取任务日志',
 }
 
 const QingLongAPI = {
@@ -10,6 +11,7 @@ const QingLongAPI = {
     ENV: '/open/envs',
     CRON_JOB: '/open/crons',
     TRIGGER_JOB: '/open/crons/run',
+    GET_LOG: '/open/crons/%s/log',
 }
 
 const USAGE_HELP_TEXT = `
@@ -20,6 +22,7 @@ const USAGE_HELP_TEXT = `
 - 更新环境变量： **更新环境变量#环境变量名称=环境变量值** （如 **更新环境变量#meituanCookie=abc123** ）
 - 获取所有任务：直接向机器人发送 **获取所有任务** 命令即可
 - 运行任务：**运行任务#定时任务名称**
+- 获取任务日志: **获取任务日志#定时任务名称**
 `;
 
 export {

@@ -14,7 +14,7 @@ interface TriggerJobRequest extends QingLongRequest {
 interface Response {
     code: number,
     message?: string,
-    data?: LoginResult | GetAllEnvResponse[] | GetAllCronJobResponse[],
+    data?: LoginResult | GetAllEnvResponse[] | GetAllCronJobResponse[] | getJobLogResponse,
 }
 
 interface LoginResult {
@@ -60,6 +60,10 @@ interface GetAllCronJobData {
     updatedAt: string,
 }
 
+interface getJobLogResponse {
+    [property: string]: string
+}
+
 export {
     QingLongRequest,
     UpdateEnvRequest,
@@ -68,4 +72,5 @@ export {
     LoginResult,
     GetAllEnvResponse,
     GetAllCronJobResponse,
+    getJobLogResponse,
 }

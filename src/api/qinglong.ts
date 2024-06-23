@@ -118,6 +118,19 @@ async function updateEnvironmentVariables(
     ensureSuccessfulResponse(updateEnvResponse);
 }
 
+async function getCronJobLog(jobName: string): Promise<string> {
+    const allJobs = await getAllCronJobs();
+    const jobToBeTriggered = allJobs.data.filter(job => job.name === jobName)[0];
+    if (!jobToBeTriggered) {
+        throw new QingLongJobNotFoundError(jobName);
+    }
+
+    const jobId = jobToBeTriggered.id;
+    const jobLog = await doGetRequest<string>(util.format(QingLongAPI.GET_LOG, jobId));
+
+    return jobLog.split('\n').join('\n\n');
+}
+
 async function doGetRequest<T>(path: string): Promise<T> {
     const response = await axios.get(
         `${baseUrl}${path}`,
@@ -169,4 +182,5 @@ export {
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,
+    getCronJobLog,
 }
