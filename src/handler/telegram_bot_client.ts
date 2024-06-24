@@ -1,10 +1,11 @@
+import util from 'node:util';
 import {HttpsProxyAgent} from 'https-proxy-agent';
 import {Context, Telegraf} from 'telegraf';
+import {message} from 'telegraf/filters';
 import {marked} from 'marked';
 import {Command, USAGE_HELP_TEXT} from '../constants.js';
-import {message} from 'telegraf/filters';
 import {processCommand} from '../util/command_processor.js';
-import util from 'node:util';
+import {getErrorMessage} from '../util/error_utils.js';
 
 function registerTelegramBotClient() {
     const botToken = process.env.TG_BOT_TOKEN as string;
@@ -33,11 +34,17 @@ function registerTelegramBotClient() {
     bot.start(ctx => handleStartCommand(ctx));
     bot.command('help', handleHelpCommand);
     bot.on(message('text'), handleCommand);
-    void bot.launch();
-    console.info('Telegram机器人注册成功');
+    bot.catch(error => console.error(getErrorMessage(error)));
 
     process.once('SIGINT', () => bot.stop('SIGINT'));
     process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+    bot.launch().catch(error => {
+        // 注册成功不代表能连上，连不上的话telegraf会抛出一个error并导致本应用崩溃
+        // 所以需要在这里处理这个error
+        console.error(`Telegram机器人无法连接到Telegram服务器，初始化失败。错误信息：${getErrorMessage(error)}`);
+    });
+    console.info('Telegram机器人注册成功');
 }
 
 async function handleStartCommand(context: Context): Promise<void> {
