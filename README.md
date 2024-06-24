@@ -11,8 +11,9 @@
 ## 目前支持的机器人
 
 - 钉钉群聊自定义机器人
+- Telegram机器人
 
-## 使用
+## 配置和部署
 
 ### 获得青龙的Client ID和Client Secret
 
@@ -35,10 +36,28 @@
 - 进入钉钉客户端，选择组织默认的全员群或创建一个群，点击右上角的`群设置`，点击`机器人`，然后点击`添加机器人`
   ，在搜索框中搜索刚刚创建的应用的名字，然后跟随指引添加
 
+#### Telegram
+
+- 使用`BotFather`机器人创建一个Bot，按要求回复各个问题，最后记下bot token备用
+- 关注这个刚刚创建的Bot，发送`/start`命令开始使用
+
 ### 部署
 
 如果你访问Docker
 Hub有困难，那么也可以换成托管在阿里云的镜像`registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot`。
+
+#### 配置参数
+
+- 必填（如填写不完整则本应用会拒绝启动）
+    - QINGLONG_URL：青龙的URL，如http://127.0.0.1:5700
+    - QINGLONG_CLIENT_ID：青龙的Client ID
+    - QINGLONG_CLIENT_SECRET：青龙的Client Secret
+- 钉钉机器人（如填写不完整，则不会启用钉钉机器人）
+    - DINGTALK_CLIENT_ID：钉钉机器人的Client ID
+    - DINGTALK_CLIENT_SECRET：钉钉机器人的Client Secret
+- Telegram机器人
+    - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
+    - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
 
 #### Docker
 
@@ -49,6 +68,8 @@ docker run -d --restart always \
   -e QINGLONG_CLIENT_SECRET=<青龙的Client Secret> \
   -e DINGTALK_CLIENT_ID=<钉钉机器人的Client ID> \
   -e DINGTALK_CLIENT_SECRET=<钉钉机器人的Client Secret> \
+  -e TG_BOT_TOKEN=<Telegram机器人的bot token> \
+  -e TG_PROXY=<用于访问Telegram的HTTP代理地址> \
   -p 3000:3000 \
   --name qinglong-bot \
   boris1993/qinglong-bot:latest
@@ -72,13 +93,17 @@ services:
       QINGLONG_CLIENT_SECRET: <青龙的Client Secret>
       DINGTALK_CLIENT_ID: <钉钉机器人的Client ID>
       DINGTALK_CLIENT_SECRET: <钉钉机器人的Client Secret>
+      TG_BOT_TOKEN: <Telegram机器人的bot token>
+      TG_PROXY: <用于访问Telegram的HTTP代理地址>
     ports:
       - '3000:3000'
 ```
 
-### 使用
+## 使用
 
-| 命令       | 用法                  |
+### 支持的命令
+
+| 命令       | 格式                  |
 |----------|---------------------|
 | 获取所有环境变量 | 获取所有环境变量            |
 | 更新环境变量   | 更新环境变量#环境变量名称=环境变量值 |
@@ -86,9 +111,12 @@ services:
 | 运行任务     | 运行任务#定时任务名称         |
 | 获取任务日志   | 获取任务日志#定时任务名称       |
 
-#### 钉钉
+### 用法
 
-在添加好机器人后，就可以在群里通过at这个机器人的方式来操作，用法见上面的命令一览表。
+| 客户端      | 说明                          |
+|----------|-----------------------------|
+| 钉钉       | 在添加好机器人后，通过在群里at这个机器人的方式来操作 |
+| Telegram | 直接向机器人发送命令即可                |
 
 ## 许可协议
 
