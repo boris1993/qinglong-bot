@@ -12,7 +12,7 @@ const QingLongAPI = {
     CRON_JOB: '/open/crons',
     TRIGGER_JOB: '/open/crons/run',
     GET_LOG: '/open/crons/%s/log',
-}
+};
 
 const USAGE_HELP_TEXT = `
 当前支持的命令有：%s
@@ -29,4 +29,4 @@ export {
     Command,
     QingLongAPI,
     USAGE_HELP_TEXT
-}
+};

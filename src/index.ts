@@ -1,9 +1,12 @@
+import 'dotenv/config';
 import Express from 'express';
 import {initializeQingLongAPIClient} from './api/qinglong.js';
 import {registerDingTalkStreamClient} from './handler/dingtalk_stream_client.js';
+import {registerTelegramBotClient} from './handler/telegram_bot_client.js';
 
 const webhookInitializer = [
     registerDingTalkStreamClient,
+    registerTelegramBotClient,
 ];
 
 function startExpressServer() {

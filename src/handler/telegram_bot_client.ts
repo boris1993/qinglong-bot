@@ -1,0 +1,91 @@
+import {HttpsProxyAgent} from 'https-proxy-agent';
+import {Context, Telegraf} from 'telegraf';
+import {marked} from 'marked';
+import {Command, USAGE_HELP_TEXT} from '../constants.js';
+import {message} from 'telegraf/filters';
+import {processCommand} from '../util/command_processor.js';
+import util from 'node:util';
+
+function registerTelegramBotClient() {
+    const botToken = process.env.TG_BOT_TOKEN as string;
+    if (!botToken) {
+        console.warn('Telegram bot token未指定，跳过注册Telegram机器人');
+        return;
+    }
+
+    let agent: HttpsProxyAgent<string> | undefined = undefined;
+    const proxyUrl = process.env.TG_PROXY || '';
+    if (proxyUrl) {
+        agent = new HttpsProxyAgent(proxyUrl);
+    }
+
+    let bot;
+    if (agent) {
+        bot = new Telegraf(botToken, {
+            telegram: {
+                agent: agent,
+            },
+        });
+    } else {
+        bot = new Telegraf(botToken);
+    }
+
+    bot.start(ctx => handleStartCommand(ctx));
+    bot.command('help', handleHelpCommand);
+    bot.on(message('text'), handleCommand);
+    void bot.launch();
+    console.info('Telegram机器人注册成功');
+
+    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGTERM', () => bot.stop('SIGTERM'));
+}
+
+async function handleStartCommand(context: Context): Promise<void> {
+    await sendReply(context, `欢迎使用青龙机器人\n\n${formatHelpMessage()}`);
+}
+
+async function handleHelpCommand(context: Context): Promise<void> {
+    await sendReply(context, formatHelpMessage());
+}
+
+async function handleCommand(context: Context): Promise<void> {
+    const messageText = context.text || '';
+    const [command, content] = messageText.trim().split('#');
+    const responseMessage = await processCommand(command, content);
+    await sendReply(context, responseMessage);
+}
+
+function formatHelpMessage(): string {
+    return util.format(
+        USAGE_HELP_TEXT,
+        Object.values(Command).map(key => `\`${key}\``).join('，')
+    );
+}
+
+async function sendReply(context: Context, message: string) {
+    // Telegram的Markdown格式神烦，得escape一堆东西，那还不如转成HTML发
+    const replyHtml = await marked.parseInline(message.trim());
+    const stringParts = replyHtml.split('\n').filter(parts => parts);
+
+    // Telegram限制一条信息长度不能超过4KB，所以需要把长消息截断分批发送
+    let replyString = '';
+    for (const part of stringParts) {
+        // 拼接满4KB就发，然后清空缓冲区并继续拼接
+        if (replyString.length + part.length >= 4096) {
+            await context.replyWithHTML(replyString);
+            replyString = '';
+        }
+
+        // 否则就继续拼接
+        replyString += `${part.trim()}\n`;
+    }
+
+    // 前面几段都发完之后，缓冲区大概率还有最后一段没发，那么现在发出去
+    if (replyString) {
+        await context.replyWithHTML(replyString);
+    }
+}
+
+export {
+    registerTelegramBotClient,
+};
