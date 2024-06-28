@@ -109,7 +109,7 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot
           flavor: |
             latest=false
-            prefix=node18,onlatest=true
+            prefix=node18-,onlatest=true
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
