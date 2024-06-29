@@ -24,7 +24,7 @@ RUN corepack enable
 
 COPY --from=build /app/package.json .
 COPY --from=build /app/pnpm-lock.yaml .
-RUN pnpm install
+RUN pnpm install --ignore-scripts
 
 COPY --from=build /app/dist ./dist
 
