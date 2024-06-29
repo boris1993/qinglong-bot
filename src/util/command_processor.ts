@@ -55,7 +55,9 @@ async function processCommand(command: string, content: string): Promise<string>
 }
 
 async function handleUpdateEnv(content: string) {
-    const [envKey, envValue] = content.split('=');
+    const equalSignIndex = content.indexOf('=');
+    const envKey = content.substring(0, equalSignIndex);
+    const envValue = content.substring(equalSignIndex + 1, content.length);
 
     let responseMessage: string;
     try {
