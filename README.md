@@ -17,8 +17,7 @@
 
 ### 获得青龙的Client ID和Client Secret
 
-- 前往青龙面板的`系统设置`->`应用设置`页面，创建一个新应用并赋予`环境变量`权限
-  ![](/docs/qinglong-create-application.png)
+- 前往青龙面板的`系统设置`->`应用设置`页面，创建一个新应用并赋予`环境变量`和`定时任务`权限
 - 创建成功后，分别点击Client ID列和Client Secret列的复制图标，得到青龙的Client ID和Client Secret
 
 ### 创建和添加机器人
