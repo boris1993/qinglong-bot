@@ -1,6 +1,12 @@
 abstract class QingLongRequest {
 }
 
+interface AddEnvRequest extends QingLongRequest {
+    name: string,
+    value: string,
+    remarks: string
+}
+
 interface UpdateEnvRequest extends QingLongRequest {
     id: number,
     name: string,
@@ -66,6 +72,7 @@ interface getJobLogResponse {
 
 export {
     QingLongRequest,
+    AddEnvRequest,
     UpdateEnvRequest,
     TriggerJobRequest,
     Response,

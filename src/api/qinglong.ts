@@ -3,6 +3,7 @@ import axios from 'axios';
 import {QingLongAPI} from '../constants.js';
 import {
     TriggerJobRequest,
+    AddEnvRequest,
     UpdateEnvRequest,
     Response,
     LoginResult,
@@ -17,10 +18,11 @@ import {
     QingLongInitializationError,
     QingLongJobNotFoundError,
 } from '../error/error.js';
+import {extractEnvKeyAndValue} from '../util/utils.js';
 
 axios.defaults.validateStatus = (status) => {
     return status < 500;
-}
+};
 
 let baseUrl = '';
 let clientId = '';
@@ -89,10 +91,33 @@ async function triggerJob(jobName: string): Promise<void> {
     await doPutRequest(QingLongAPI.TRIGGER_JOB, triggerJobRequest);
 }
 
-async function updateEnvironmentVariables(
-    key: string,
-    value: string
-) {
+async function addEnvironmentVariable(content: string): Promise<string[][]> {
+    const envPairs = content.split(',').map(envPair => envPair.trim());
+
+    const envsToBeAdded: AddEnvRequest[] = [];
+    const invalidPairs: string[] = [];
+    for (const envPair of envPairs) {
+        const [envKey, envValue] = extractEnvKeyAndValue(envPair);
+        if (!envKey || !envValue) {
+            invalidPairs.push(envPair);
+            continue;
+        }
+
+        const addEnvRequest: AddEnvRequest = {
+            name: envKey,
+            value: envValue,
+            remarks: ''
+        };
+        envsToBeAdded.push(addEnvRequest);
+    }
+
+    await doPostRequest<AddEnvRequest[]>(QingLongAPI.ENV, envsToBeAdded);
+    const addedEnvs = envsToBeAdded.map(envsToBeAdded => envsToBeAdded.name);
+
+    return [addedEnvs, invalidPairs];
+}
+
+async function updateEnvironmentVariables(key: string, value: string) {
     if (!key || !value) {
         throw new BadRequestError('更新环境变量消息格式有误，正确格式为：key=value');
     }
@@ -148,6 +173,17 @@ async function doPutRequest<T extends QingLongRequest>(path: string, data: T): P
     ensureSuccessfulResponse(qingLongResponse);
 }
 
+async function doPostRequest<T extends QingLongRequest>(path: string, data: T): Promise<void> {
+    const response = await axios.post(
+        `${baseUrl}${path}`,
+        data,
+        getAxiosRequestConfig(),
+    );
+
+    const qingLongResponse = response.data as Response;
+    ensureSuccessfulResponse(qingLongResponse);
+}
+
 function ensureSuccessfulResponse(response: Response) {
     const code = response.code;
     if (code !== 200) {
@@ -166,9 +202,10 @@ function getAxiosRequestConfig(): object {
 
 export {
     initializeQingLongAPIClient,
+    addEnvironmentVariable,
     updateEnvironmentVariables,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,
     getCronJobLog,
-}
+};

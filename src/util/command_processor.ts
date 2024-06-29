@@ -1,5 +1,6 @@
 import * as util from 'node:util';
 import {
+    addEnvironmentVariable,
     updateEnvironmentVariables,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
@@ -8,6 +9,7 @@ import {
 } from '../api/qinglong.js';
 import {USAGE_HELP_TEXT, Command} from '../constants.js';
 import {getErrorMessage} from './error_utils.js';
+import {extractEnvKeyAndValue} from './utils.js';
 
 async function processCommand(command: string, content: string): Promise<string> {
     let responseMessage: string;
@@ -16,6 +18,10 @@ async function processCommand(command: string, content: string): Promise<string>
             case Command.GET_ALL_ENV: {
                 const allEnvKeys = await getAllEnvironmentVariableKeys();
                 responseMessage = `环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+                break;
+            }
+            case Command.ADD_ENV: {
+                responseMessage = await handleAddEnv(content);
                 break;
             }
             case Command.UPDATE_ENV: {
@@ -54,10 +60,23 @@ async function processCommand(command: string, content: string): Promise<string>
     return responseMessage;
 }
 
+async function handleAddEnv(content: string): Promise<string> {
+    let responseMessage: string = '';
+    try {
+        const [envAdded, invalidEnvPairs] = await addEnvironmentVariable(content);
+        responseMessage += `成功添加环境变量${envAdded.join(',')}`;
+        if (invalidEnvPairs.length > 0) {
+            responseMessage += `，如下环境变量添加失败\n\n${invalidEnvPairs.join('\n\n')}`;
+        }
+    } catch (error) {
+        responseMessage = `添加环境变量失败，错误信息：${getErrorMessage(error)}。可能因为要添加的环境变量已存在。`;
+    }
+
+    return responseMessage;
+}
+
 async function handleUpdateEnv(content: string) {
-    const equalSignIndex = content.indexOf('=');
-    const envKey = content.substring(0, equalSignIndex);
-    const envValue = content.substring(equalSignIndex + 1, content.length);
+    const [envKey, envValue] = extractEnvKeyAndValue(content);
 
     let responseMessage: string;
     try {
@@ -72,6 +91,7 @@ async function handleUpdateEnv(content: string) {
     return responseMessage;
 }
 
+
 export {
     processCommand,
-}
+};

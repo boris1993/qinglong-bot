@@ -1,6 +1,7 @@
 enum Command {
     GET_ALL_ENV = '获取所有环境变量',
     UPDATE_ENV = '更新环境变量',
+    ADD_ENV = '添加环境变量',
     GET_ALL_CRON_JOBS = '获取所有任务',
     TRIGGER_JOB = '运行任务',
     GET_LOG = '获取任务日志',
