@@ -1,4 +1,4 @@
-FROM node:18.20 AS build
+FROM --platform=linux/amd64 node:18.20 AS build
 
 WORKDIR /app
 RUN corepack enable

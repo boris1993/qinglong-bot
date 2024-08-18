@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build
+FROM --platform=linux/amd64 node:lts-alpine AS build
 
 WORKDIR /app
 RUN corepack enable
