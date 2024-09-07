@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: '20.x'
       - run: corepack enable
+      - run: pnpm install
       - run: pnpm test
   build:
     needs: test
