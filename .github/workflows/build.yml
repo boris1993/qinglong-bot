@@ -12,12 +12,22 @@ on:
       - "*.md"
       - "LICENSE"
 
+env:
+  DOCKER_REGISTRY: https://hub.docker.com/
+  DOCKER_TARGET_PLATFORM: linux/amd64
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_REGISTRY: https://hub.docker.com/
-      DOCKER_TARGET_PLATFORM: linux/amd64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - run: npm test
+  build:
+    needs: test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,10 +87,8 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
   build-node18:
+    needs: test
     runs-on: ubuntu-latest
-    env:
-      DOCKER_REGISTRY: https://hub.docker.com/
-      DOCKER_TARGET_PLATFORM: linux/amd64
     steps:
       - name: Checkout
         uses: actions/checkout@v4

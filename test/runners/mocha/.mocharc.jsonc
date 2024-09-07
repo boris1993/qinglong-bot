@@ -1,0 +1,8 @@
+{
+  "require": [
+    "register.js"
+  ],
+  "spec": [
+    "test/**/*.spec.ts"
+  ]
+}
