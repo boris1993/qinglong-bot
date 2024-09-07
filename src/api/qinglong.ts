@@ -67,7 +67,14 @@ async function getAllEnvironmentVariables(): Promise<GetAllEnvResponse[]> {
 
 async function getAllEnvironmentVariableKeys(): Promise<string[]> {
     const allEnvironmentVariables = await getAllEnvironmentVariables();
-    return allEnvironmentVariables.map(env => env.name);
+    return allEnvironmentVariables.map(env => {
+        let envNameAndComment = env.name;
+        if (env.remarks) {
+            envNameAndComment += `（${env.remarks}）`;
+        }
+
+        return envNameAndComment;
+    });
 }
 
 async function getAllCronJobs(): Promise<GetAllCronJobResponse> {
