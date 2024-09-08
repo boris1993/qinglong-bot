@@ -3,7 +3,7 @@
 ![GitHub License](https://img.shields.io/github/license/boris1993/qinglong-bot)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/boris1993/qinglong-bot/build.yml)
 ![Docker Pulls](https://img.shields.io/docker/pulls/boris1993/qinglong-bot)
-![Docker Image Version](https://img.shields.io/docker/v/boris1993/qinglong-bot)
+![Docker Image Version](https://img.shields.io/docker/v/boris1993/qinglong-bot?sort=semver)
 ![Docker Image Size](https://img.shields.io/docker/image-size/boris1993/qinglong-bot)
 
 迫于美团脚本的cookie经常过期，而想起更新的时候我通常访问不到自己服务器上的青龙面版，于是开发了这个工具来通过机器人来更新。
