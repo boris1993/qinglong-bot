@@ -20,7 +20,7 @@ function registerTelegramBotClient() {
         agent = new HttpsProxyAgent(proxyUrl);
     }
 
-    const tgApiRoot = process.env.TG_API_ROOT as string;
+    const tgApiRoot = process.env.TG_API_ROOT as string || "https://api.telegram.org";
     let bot;
     if (agent) {
         bot = new Telegraf(botToken, {
