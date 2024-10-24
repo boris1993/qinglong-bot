@@ -57,7 +57,7 @@ Hub有困难，那么也可以换成托管在阿里云的镜像`registry.cn-hang
 - Telegram机器人
     - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
     - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
-    - TG_API_HOST：自定义Telegram API的域名，默认为api.telegram.org
+    - TG_API_ROOT：自定义Telegram API的域名，默认为api.telegram.org
 
 #### Docker
 
@@ -70,7 +70,7 @@ docker run -d --restart always \
   -e DINGTALK_CLIENT_SECRET=<钉钉机器人的Client Secret> \
   -e TG_BOT_TOKEN=<Telegram机器人的bot token> \
   -e TG_PROXY=<用于访问Telegram的HTTP代理地址> \
-  -e TG_API_HOST=<自定义Telegram API域名> \
+  -e TG_API_ROOT=<自定义Telegram API域名> \
   -p 3000:3000 \
   --name qinglong-bot \
   boris1993/qinglong-bot:latest
@@ -96,7 +96,7 @@ services:
       DINGTALK_CLIENT_SECRET: <钉钉机器人的Client Secret>
       TG_BOT_TOKEN: <Telegram机器人的bot token>
       TG_PROXY: <用于访问Telegram的HTTP代理地址>
-      TG_API_HOST: <自定义Telegram API域名>
+      TG_API_ROOT: <自定义Telegram API域名>
     ports:
       - '3000:3000'
 ```
