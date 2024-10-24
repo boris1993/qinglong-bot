@@ -20,15 +20,21 @@ function registerTelegramBotClient() {
         agent = new HttpsProxyAgent(proxyUrl);
     }
 
+    const tgApiRoot = process.env.TG_API_ROOT as string;
     let bot;
     if (agent) {
         bot = new Telegraf(botToken, {
             telegram: {
                 agent: agent,
+                apiRoot: tgApiRoot,
             },
         });
     } else {
-        bot = new Telegraf(botToken);
+        bot = new Telegraf(botToken, {
+            telegram: {
+                apiRoot: tgApiRoot,
+            },
+        });
     }
 
     bot.start(ctx => handleStartCommand(ctx));
