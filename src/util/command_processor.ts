@@ -2,6 +2,7 @@ import * as util from 'node:util';
 import {
     addEnvironmentVariable,
     updateEnvironmentVariables,
+    deleteEnvironmentVariable,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,
@@ -26,6 +27,10 @@ async function processCommand(command: string, content: string): Promise<string>
             }
             case Command.UPDATE_ENV: {
                 responseMessage = await handleUpdateEnv(content);
+                break;
+            }
+            case Command.DELETE_ENV: {
+                responseMessage = await handleDeleteEnv(content);
                 break;
             }
             case Command.GET_ALL_CRON_JOBS: {
@@ -91,6 +96,18 @@ async function handleUpdateEnv(content: string) {
     return responseMessage;
 }
 
+async function handleDeleteEnv(content: string) {
+    let responseMessage: string;
+    try {
+        const envIds = [...new Set(content.split(',').map(id => id.trim()))].map(id => Number(id));
+        await deleteEnvironmentVariable(envIds);
+        responseMessage = `成功删除环境变量${envIds.join(',')}`;
+    } catch (error) {
+        responseMessage = `删除环境变量失败，错误信息：${getErrorMessage(error)}`;
+    }
+
+    return responseMessage;
+}
 
 export {
     processCommand,
