@@ -3,6 +3,8 @@ import {
     addEnvironmentVariable,
     updateEnvironmentVariables,
     deleteEnvironmentVariable,
+    enableEnvironmentVariable,
+    disableEnvironmentVariable,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,
@@ -31,6 +33,14 @@ async function processCommand(command: string, content: string): Promise<string>
             }
             case Command.DELETE_ENV: {
                 responseMessage = await handleDeleteEnv(content);
+                break;
+            }
+            case Command.ENABLE_ENV: {
+                responseMessage = await handleEnableEnv(content);
+                break;
+            }
+            case Command.DISABLE_ENV: {
+                responseMessage = await handleDisableEnv(content);
                 break;
             }
             case Command.GET_ALL_CRON_JOBS: {
@@ -77,6 +87,9 @@ async function handleAddEnv(content: string): Promise<string> {
         responseMessage = `添加环境变量失败，错误信息：${getErrorMessage(error)}。可能因为要添加的环境变量已存在。`;
     }
 
+    const allEnvKeys = await getAllEnvironmentVariableKeys();
+    responseMessage += `\n\n当前环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+
     return responseMessage;
 }
 
@@ -93,6 +106,9 @@ async function handleUpdateEnv(content: string) {
         responseMessage = `环境变量更新失败，错误信息：${errorMessage}`;
     }
 
+    const allEnvKeys = await getAllEnvironmentVariableKeys();
+    responseMessage += `\n\n当前环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+
     return responseMessage;
 }
 
@@ -105,6 +121,41 @@ async function handleDeleteEnv(content: string) {
     } catch (error) {
         responseMessage = `删除环境变量失败，错误信息：${getErrorMessage(error)}`;
     }
+
+    const allEnvKeys = await getAllEnvironmentVariableKeys();
+    responseMessage += `\n\n当前环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+
+    return responseMessage;
+}
+
+async function handleEnableEnv(content: string) {
+    let responseMessage: string;
+    try {
+        const envIds = [...new Set(content.split(',').map(id => id.trim()))].map(id => Number(id));
+        await enableEnvironmentVariable(envIds);
+        responseMessage = `成功启用环境变量${envIds.join(',')}`;
+    } catch (error) {
+        responseMessage = `启用环境变量失败，错误信息：${getErrorMessage(error)}`;
+    }
+
+    const allEnvKeys = await getAllEnvironmentVariableKeys();
+    responseMessage += `\n\n当前环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
+
+    return responseMessage;
+}
+
+async function handleDisableEnv(content: string) {
+    let responseMessage: string;
+    try {
+        const envIds = [...new Set(content.split(',').map(id => id.trim()))].map(id => Number(id));
+        await disableEnvironmentVariable(envIds);
+        responseMessage = `成功禁用环境变量${envIds.join(',')}`;
+    } catch (error) {
+        responseMessage = `禁用环境变量失败，错误信息：${getErrorMessage(error)}`;
+    }
+
+    const allEnvKeys = await getAllEnvironmentVariableKeys();
+    responseMessage += `\n\n当前环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
 
     return responseMessage;
 }

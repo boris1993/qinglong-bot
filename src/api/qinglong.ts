@@ -71,9 +71,15 @@ async function getAllEnvironmentVariableKeys(): Promise<string[]> {
         let envNameAndComment = env.name;
         if (env.remarks) {
             envNameAndComment += `（${env.remarks}）`;
+        } else {
+            envNameAndComment += '（...）';
         }
 
-        return env.id + '：' + envNameAndComment;
+        const updatedAt = new Date(env.updatedAt).toLocaleString();
+        const status = env.status === 0 ? '✅' : '🈲';
+        const fullEnv = `${env.id}：${envNameAndComment} ${updatedAt} ${status}`;
+
+        return fullEnv;
     });
 }
 
@@ -158,6 +164,14 @@ async function deleteEnvironmentVariable(envIds: number[]) {
     await doDeleteRequest(QingLongAPI.ENV, envIds);
 }
 
+async function enableEnvironmentVariable(envIds: number[]) {
+    await doPutRequest(QingLongAPI.ENV_ENABLE, envIds);
+}
+
+async function disableEnvironmentVariable(envIds: number[]) {
+    await doPutRequest(QingLongAPI.ENV_DISABLE, envIds);
+}
+
 async function getCronJobLog(jobName: string): Promise<string> {
     const allJobs = await getAllCronJobs();
     const jobToBeTriggered = allJobs.data.filter(job => job.name === jobName)[0];
@@ -239,6 +253,8 @@ export {
     addEnvironmentVariable,
     updateEnvironmentVariables,
     deleteEnvironmentVariable,
+    enableEnvironmentVariable,
+    disableEnvironmentVariable,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,
