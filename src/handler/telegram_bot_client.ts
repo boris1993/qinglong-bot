@@ -6,6 +6,7 @@ import {marked} from 'marked';
 import {Command, USAGE_HELP_TEXT} from '../constants.js';
 import {processCommand} from '../util/command_processor.js';
 import {getErrorMessage} from '../util/error_utils.js';
+import { extractCommandAndContent } from '../util/utils.js';
 
 function registerTelegramBotClient() {
     const botToken = process.env.TG_BOT_TOKEN as string;
@@ -63,7 +64,7 @@ async function handleHelpCommand(context: Context): Promise<void> {
 
 async function handleCommand(context: Context): Promise<void> {
     const messageText = context.text || '';
-    const [command, content] = messageText.trim().split('#');
+    const [command, content] = extractCommandAndContent(messageText);
     const responseMessage = await processCommand(command, content);
     await sendReply(context, responseMessage);
 }

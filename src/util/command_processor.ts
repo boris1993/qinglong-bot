@@ -10,7 +10,7 @@ import {
     triggerJob,
     getCronJobLog,
 } from '../api/qinglong.js';
-import {USAGE_HELP_TEXT, Command} from '../constants.js';
+import {USAGE_HELP_TEXT, Command, SimpleCommand} from '../constants.js';
 import {getErrorMessage} from './error_utils.js';
 import {extractEnvKeyAndValue} from './utils.js';
 
@@ -18,49 +18,59 @@ async function processCommand(command: string, content: string): Promise<string>
     let responseMessage: string;
     try {
         switch (command) {
-            case Command.GET_ALL_ENV: {
+            case Command.GET_ALL_ENV:
+            case SimpleCommand.GET_ALL_ENV: {
                 const allEnvKeys = await getAllEnvironmentVariableKeys();
                 responseMessage = `环境变量列表:\n\n${allEnvKeys.join('\n\n')}`;
                 break;
             }
-            case Command.ADD_ENV: {
+            case Command.ADD_ENV:
+            case SimpleCommand.ADD_ENV: {
                 responseMessage = await handleAddEnv(content);
                 break;
             }
-            case Command.UPDATE_ENV: {
+            case Command.UPDATE_ENV:
+            case SimpleCommand.UPDATE_ENV: {
                 responseMessage = await handleUpdateEnv(content);
                 break;
             }
-            case Command.DELETE_ENV: {
+            case Command.DELETE_ENV:
+            case SimpleCommand.DELETE_ENV: {
                 responseMessage = await handleDeleteEnv(content);
                 break;
             }
-            case Command.ENABLE_ENV: {
+            case Command.ENABLE_ENV:
+            case SimpleCommand.ENABLE_ENV: {
                 responseMessage = await handleEnableEnv(content);
                 break;
             }
-            case Command.DISABLE_ENV: {
+            case Command.DISABLE_ENV:
+            case SimpleCommand.DISABLE_ENV: {
                 responseMessage = await handleDisableEnv(content);
                 break;
             }
-            case Command.GET_ALL_CRON_JOBS: {
+            case Command.GET_ALL_CRON_JOBS:
+            case SimpleCommand.GET_ALL_CRON_JOBS: {
                 const allCronJobs = await getAllCronJobNames();
                 responseMessage = `定时任务列表：\n\n${allCronJobs.join('\n\n')}`;
                 break;
             }
-            case Command.TRIGGER_JOB: {
+            case Command.TRIGGER_JOB:
+            case SimpleCommand.TRIGGER_JOB: {
                 await triggerJob(content);
                 responseMessage = `已执行定时任务${content}`;
                 break;
             }
-            case Command.GET_LOG: {
+            case Command.GET_LOG:
+            case SimpleCommand.GET_LOG: {
                 responseMessage = await getCronJobLog(content);
                 break;
             }
             default: {
                 responseMessage = util.format(
                     USAGE_HELP_TEXT,
-                    Object.values(Command).map(key => `\`${key}\``).join('，')
+                    Object.values(Command).map(key => `\`${key}\``).join('，'),
+                    Object.values(SimpleCommand).map(key => `\`${key}\``).join('，'),
                 ).trim();
                 break;
             }

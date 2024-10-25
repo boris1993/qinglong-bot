@@ -2,6 +2,7 @@ import axios from 'axios';
 import {DWClient, DWClientDownStream, RobotMessage, TOPIC_ROBOT} from 'dingtalk-stream';
 import {DingTalkMessage} from '../model/dingtalk.js';
 import {processCommand} from '../util/command_processor.js';
+import { extractCommandAndContent } from '../util/utils.js';
 
 let client: DWClient;
 
@@ -26,7 +27,7 @@ function registerDingTalkStreamClient() {
 
 const onBotMessage = async (event: DWClientDownStream) => {
     const message = JSON.parse(event.data) as RobotMessage;
-    const [command, content] = (message?.text?.content || '').trim().split('#');
+    const [command, content] = extractCommandAndContent(message?.text?.content || '');
 
     const responseMessage: string = await processCommand(command, content);
     const accessToken = await client.getAccessToken();
