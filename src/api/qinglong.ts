@@ -71,9 +71,15 @@ async function getAllEnvironmentVariableKeys(): Promise<string[]> {
         let envNameAndComment = env.name;
         if (env.remarks) {
             envNameAndComment += `（${env.remarks}）`;
+        } else {
+            envNameAndComment += '（...）';
         }
 
-        return envNameAndComment;
+        const updatedAt = new Date(env.updatedAt).toLocaleString();
+        const status = env.status === 0 ? '✅' : '🈲';
+        const fullEnv = `${env.id}：${envNameAndComment} ${updatedAt} ${status}`;
+
+        return fullEnv;
     });
 }
 
@@ -111,7 +117,7 @@ async function addEnvironmentVariable(content: string): Promise<string[][]> {
         }
 
         const addEnvRequest: AddEnvRequest = {
-            name: envKey,
+            name: envKey as string,
             value: envValue,
             remarks: ''
         };
@@ -124,15 +130,25 @@ async function addEnvironmentVariable(content: string): Promise<string[][]> {
     return [addedEnvs, invalidPairs];
 }
 
-async function updateEnvironmentVariables(key: string, value: string) {
-    if (!key || !value) {
-        throw new BadRequestError('更新环境变量消息格式有误，正确格式为：key=value');
+async function updateEnvironmentVariables(keyOrId: string | number, value: string) {
+    if (!keyOrId || !value) {
+        throw new BadRequestError('更新环境变量消息格式有误，正确格式为：key=value 或 id=value');
     }
 
-    const allEnvironmentVariables = await getAllEnvironmentVariables();
-    const envToBeUpdated = allEnvironmentVariables.filter(env => env.name === key)[0];
-    if (!envToBeUpdated) {
-        throw new QingLongEnvNotFoundError(key);
+    let envToBeUpdated: GetAllEnvResponse | undefined;
+
+    if (typeof keyOrId === 'string') {
+        const allEnvironmentVariables = await getAllEnvironmentVariables();
+        envToBeUpdated = allEnvironmentVariables.filter(env => env.name === keyOrId)[0];
+        if (!envToBeUpdated) {
+            throw new QingLongEnvNotFoundError(keyOrId);
+        }
+    } else {
+        const allEnvironmentVariables = await getAllEnvironmentVariables();
+        envToBeUpdated = allEnvironmentVariables.filter(env => env.id === keyOrId)[0];
+        if (!envToBeUpdated) {
+            throw new QingLongEnvNotFoundError(`ID: ${keyOrId}`);
+        }
     }
 
     const updateEnvRequest: UpdateEnvRequest = {
@@ -142,6 +158,18 @@ async function updateEnvironmentVariables(key: string, value: string) {
     };
 
     await doPutRequest<UpdateEnvRequest>(QingLongAPI.ENV, updateEnvRequest);
+}
+
+async function deleteEnvironmentVariable(envIds: number[]) {
+    await doDeleteRequest(QingLongAPI.ENV, envIds);
+}
+
+async function enableEnvironmentVariable(envIds: number[]) {
+    await doPutRequest(QingLongAPI.ENV_ENABLE, envIds);
+}
+
+async function disableEnvironmentVariable(envIds: number[]) {
+    await doPutRequest(QingLongAPI.ENV_DISABLE, envIds);
 }
 
 async function getCronJobLog(jobName: string): Promise<string> {
@@ -191,6 +219,19 @@ async function doPostRequest<T extends QingLongRequest>(path: string, data: T): 
     ensureSuccessfulResponse(qingLongResponse);
 }
 
+async function doDeleteRequest<T extends QingLongRequest>(path: string, data: T) {
+    const response = await axios.delete(
+        `${baseUrl}${path}`,
+        {
+            ...getAxiosRequestConfig(),
+            data,
+        },
+    );
+
+    const qingLongResponse = response.data as Response;
+    ensureSuccessfulResponse(qingLongResponse);
+}
+
 function ensureSuccessfulResponse(response: Response) {
     const code = response.code;
     if (code !== 200) {
@@ -211,6 +252,9 @@ export {
     initializeQingLongAPIClient,
     addEnvironmentVariable,
     updateEnvironmentVariables,
+    deleteEnvironmentVariable,
+    enableEnvironmentVariable,
+    disableEnvironmentVariable,
     getAllEnvironmentVariableKeys,
     getAllCronJobNames,
     triggerJob,

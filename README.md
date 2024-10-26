@@ -48,15 +48,16 @@ Hub有困难，那么也可以换成托管在阿里云的镜像`registry.cn-hang
 #### 配置参数
 
 - 必填（如填写不完整则本应用会拒绝启动）
-    - QINGLONG_URL：青龙的URL，如http://127.0.0.1:5700
-    - QINGLONG_CLIENT_ID：青龙的Client ID
-    - QINGLONG_CLIENT_SECRET：青龙的Client Secret
+  - QINGLONG_URL：青龙的URL，如`http://127.0.0.1:5700`
+  - QINGLONG_CLIENT_ID：青龙的Client ID
+  - QINGLONG_CLIENT_SECRET：青龙的Client Secret
 - 钉钉机器人（如填写不完整，则不会启用钉钉机器人）
-    - DINGTALK_CLIENT_ID：钉钉机器人的Client ID
-    - DINGTALK_CLIENT_SECRET：钉钉机器人的Client Secret
+  - DINGTALK_CLIENT_ID：钉钉机器人的Client ID
+  - DINGTALK_CLIENT_SECRET：钉钉机器人的Client Secret
 - Telegram机器人
-    - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
-    - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
+  - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
+  - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
+  - TG_API_ROOT：自定义Telegram API的域名，默认为`https://api.telegram.org`
 
 #### Docker
 
@@ -69,6 +70,7 @@ docker run -d --restart always \
   -e DINGTALK_CLIENT_SECRET=<钉钉机器人的Client Secret> \
   -e TG_BOT_TOKEN=<Telegram机器人的bot token> \
   -e TG_PROXY=<用于访问Telegram的HTTP代理地址> \
+  -e TG_API_ROOT=<自定义Telegram API域名> \
   -p 3000:3000 \
   --name qinglong-bot \
   boris1993/qinglong-bot:latest
@@ -94,6 +96,7 @@ services:
       DINGTALK_CLIENT_SECRET: <钉钉机器人的Client Secret>
       TG_BOT_TOKEN: <Telegram机器人的bot token>
       TG_PROXY: <用于访问Telegram的HTTP代理地址>
+      TG_API_ROOT: <自定义Telegram API域名>
     ports:
       - '3000:3000'
 ```
@@ -102,14 +105,15 @@ services:
 
 ### 支持的命令
 
-| 命令       | 格式                                 |
-|----------|------------------------------------|
-| 获取所有环境变量 | 获取所有环境变量                           |
-| 添加环境变量   | 添加环境变量#环境变量名称=环境变量值（多个环境变量用英文逗号分割） |
-| 更新环境变量   | 更新环境变量#环境变量名称=环境变量值                |
-| 获取所有任务   | 获取所有任务                             |
-| 运行任务     | 运行任务#定时任务名称                        |
-| 获取任务日志   | 获取任务日志#定时任务名称                      |
+| 命令       | 简单命令 | 格式                                 |
+|----------|----------|------------------------------------|
+| 获取所有环境变量 | env list | 获取所有环境变量                           |
+| 添加环境变量   | env add  | 添加环境变量#环境变量名称=环境变量值（多个环境变量用英文逗号分割） |
+| 更新环境变量   | env put  | 更新环境变量#环境变量名称=环境变量值                |
+| 删除环境变量   | env del  | 删除环境变量#环境变量ID（多个环境变量ID用英文逗号分割）|
+| 获取所有任务   | cron list | 获取所有任务                             |
+| 运行任务     | cron run  | 运行任务#定时任务名称                        |
+| 获取任务日志   | cron log  | 获取任务日志#定时任务名称                      |
 
 ### 用法
 
