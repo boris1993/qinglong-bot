@@ -48,16 +48,16 @@ Hub有困难，那么也可以换成托管在阿里云的镜像`registry.cn-hang
 #### 配置参数
 
 - 必填（如填写不完整则本应用会拒绝启动）
-    - QINGLONG_URL：青龙的URL，如http://127.0.0.1:5700
-    - QINGLONG_CLIENT_ID：青龙的Client ID
-    - QINGLONG_CLIENT_SECRET：青龙的Client Secret
+  - QINGLONG_URL：青龙的URL，如`http://127.0.0.1:5700`
+  - QINGLONG_CLIENT_ID：青龙的Client ID
+  - QINGLONG_CLIENT_SECRET：青龙的Client Secret
 - 钉钉机器人（如填写不完整，则不会启用钉钉机器人）
-    - DINGTALK_CLIENT_ID：钉钉机器人的Client ID
-    - DINGTALK_CLIENT_SECRET：钉钉机器人的Client Secret
+  - DINGTALK_CLIENT_ID：钉钉机器人的Client ID
+  - DINGTALK_CLIENT_SECRET：钉钉机器人的Client Secret
 - Telegram机器人
-    - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
-    - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
-    - TG_API_ROOT：自定义Telegram API的域名，默认为api.telegram.org
+  - TG_BOT_TOKEN：Telegram机器人的bot token（如不填写则不会启用Telegram机器人）
+  - TG_PROXY：用于访问Telegram的HTTP代理地址，如果你能直接连接Telegram那么这个可以不填
+  - TG_API_ROOT：自定义Telegram API的域名，默认为`https://api.telegram.org`
 
 #### Docker
 
