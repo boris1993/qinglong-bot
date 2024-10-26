@@ -30,9 +30,9 @@ describe('utils tests', () => {
         expect(command2).to.equal('env add');
         expect(content2).to.equal('key=KjxvYzlOJ19gZlRBUQ==');
 
-        const text3 = "env update key=value"
+        const text3 = "env put key=value"
         const [command3, content3] = extractCommandAndContent(text3)
-        expect(command3).to.equal('env update');
+        expect(command3).to.equal('env put');
         expect(content3).to.equal('key=value');
 
         const text4 = "env delete 1,2,3,4,5"
