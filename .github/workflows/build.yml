@@ -49,7 +49,7 @@ jobs:
 
       - name: Extract metadata for DockerHub
         id: meta_for_docker_hub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             boris1993/qinglong-env-updater
@@ -61,7 +61,7 @@ jobs:
 
       - name: Extract metadata for Aliyun
         id: meta_for_aliyun
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
@@ -136,7 +136,7 @@ jobs:
 
       - name: Extract metadata for DockerHub
         id: meta_for_docker_hub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             boris1993/qinglong-env-updater
@@ -151,7 +151,7 @@ jobs:
 
       - name: Extract metadata for Aliyun
         id: meta_for_aliyun
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
