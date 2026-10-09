@@ -47,13 +47,23 @@ jobs:
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract metadata for DockerHub
+        id: meta_for_docker_hub
         uses: docker/metadata-action@v5
         with:
           images: |
             boris1993/qinglong-env-updater
             boris1993/qinglong-bot
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Extract metadata for Aliyun
+        id: meta_for_aliyun
+        uses: docker/metadata-action@v5
+        with:
+          images: |
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
             registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot
           tags: |
@@ -76,18 +86,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build and push
-        id: docker_build
+      - name: Build and push to DockerHub
+        id: docker_build_docker_hub
         uses: docker/build-push-action@v7
         with:
           platforms: linux/amd64,linux/arm64
           context: ./
           file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta_for_docker_hub.outputs.tags }}
           builder: ${{ steps.buildx.outputs.name }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push to Aliyun
+        id: docker_build_aliyun
+        uses: docker/build-push-action@v7
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: ./
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta_for_aliyun.outputs.tags }}
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          provenance: false
+          sbom: false
+
   build-node18:
     needs: test
     runs-on: ubuntu-latest
@@ -108,18 +134,28 @@ jobs:
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract metadata for DockerHub
+        id: meta_for_docker_hub
         uses: docker/metadata-action@v5
         with:
           images: |
             boris1993/qinglong-env-updater
             boris1993/qinglong-bot
-            registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
-            registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot
           flavor: |
             latest=false
             prefix=node18-,onlatest=true
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Extract metadata for Aliyun
+        id: meta_for_aliyun
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-env-updater
+            registry.cn-hangzhou.aliyuncs.com/boris1993/qinglong-bot
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -140,15 +176,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build and push
-        id: docker_build
+      - name: Build and push to Docker Hub
+        id: docker_build_docker_hub
         uses: docker/build-push-action@v7
         with:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           context: ./
           file: Dockerfile_node18
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta_for_docker_hub.outputs.tags }}
           builder: ${{ steps.buildx.outputs.name }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push to Aliyun
+        id: docker_build_aliyun
+        uses: docker/build-push-action@v7
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          context: ./
+          file: Dockerfile_node18
+          push: true
+          tags: ${{ steps.meta_for_aliyun.outputs.tags }}
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          provenance: false
+          sbom: false
